@@ -1,4 +1,4 @@
-# cs224w_project
+# Link Prediction on Foursquare Dataset
 
 ## Links
 

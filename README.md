@@ -7,8 +7,9 @@
 - Sample **proposal** for reference: [Link Prediction in Pinterest Network](http://snap.stanford.edu/cs224w-17-data/best-proposals-16/cs224w-project-proposal-poorna-amelia-viswa.pdf)
 
 
-## Project Milestone
-
+## Project Milestone (in progress)
+- Milestone Paper (overleaf): https://www.overleaf.com/3617598115nvsvsrqwtxzx
+  - (Copied from proposal for template layout. Edit as need-be)
 - Think of this as a draft of your final report but without your major results.
 - We expect that you have completed 40% of the project
 - Provide a complete picture of your project even if certain key parts have not yet been implemented/solved.
@@ -22,3 +23,7 @@
   - Description of general difficulties with your problem which bear elaboration
 - Make sure to at least outline the parts which have not yet been completed so that it is clear specifically what you plan to do for the final version.
 - Recommended length 3-5 pages
+
+
+## Project Proposal
+- Reaction Paper (overleaf): https://www.overleaf.com/3617598115nvsvsrqwtxzx

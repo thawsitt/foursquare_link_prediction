@@ -13,56 +13,76 @@ import os.path
 import re
 
 exclude = string.punctuation
-path = '../umn_foursquare_datasets/'
+path = './umn_foursquare_datasets/'
 datFiles = [
         'users.dat',
         'venues.dat',
         'socialgraph.dat',
         'checkins.dat',
-        'ratings.dat',
-        ]
+        'ratings.dat']
 
 outFiles = [
-        'users.txt',
-        'venues.txt',
-        'socialgraph.txt',
-        'checkins.txt',
-        'ratings.txt',
-        ]
+        'users.tsv',
+        'venues.tsv',
+        'socialgraph.tsv',
+        'checkins.tsv',
+        'ratings.tsv']
+headers = {
+        outFiles[0]: ['userId', 'latitude', 'longitude'],
+        outFiles[1]: ['venueId', 'latitude', 'longitude'],
+        outFiles[2]: [],
+        outFiles[3]: [],
+        outFiles[4]: [],
+        }
 
 MAX_USER_ID = -1
 
 
+def outputTsvFile(path, data):
+    pass
+
 def processUsers():
     global MAX_USER_ID
-    splitLines = []
     # Get max user id
     with open(path + datFiles[0]) as f:
-        lines = f.readlines()
-        for line in lines:
-            try:
-                splitLine = re.sub('\s+[\|]\s+', '\t', line).split()
-                if (not splitLine
-                        or '--' in splitLine[0] 
-                        or splitLine[0].isalpha() 
-                        or '(' in splitLine[0]):
-                    continue
-                if int(splitLine[0]) > MAX_USER_ID:
-                    MAX_USER_ID = int(splitLine[0])
+        line = f.readline()
+        count = 0
+        while line:
+            splitLine = re.sub('\s+[\|]\s+', '\t', line).split()
+            if (not splitLine
+                    or '--' in splitLine[0] 
+                    or splitLine[0].isalpha() 
+                    or '(' in splitLine[0]):
+                line = f.readline()
+                continue
 
-                splitLines.append(splitLine)
-            except:
-                print 'ERROR. splitLine = %s' % (splitLine)
+            if int(splitLine[0]) > MAX_USER_ID:
+                MAX_USER_ID = int(splitLine[0])
+            line = f.readline()
 
 
-        # Output formatted file
-        with open(path + outFiles[0], 'w') as tsvFile:
-            out = csv.writer(tsvFile, delimiter="\t")
-            for line in lines:
-                if line[0] == '--':
-                    out.writerow()
-                    continue
-                # TODO Print line
+    print 'max user id %d' % (MAX_USER_ID)
+
+    with open(path + datFiles[0]) as f, open(path + outFiles[0], 'w') as tsvFile:
+        out = csv.writer(tsvFile, delimiter="\t")
+        # Write header
+        out.writerow(headers[outFiles[0]])
+
+        line = f.readline()
+        count = 0
+        while line:
+            l = re.sub('\s+[\|]\s+', '\t', line)
+            splitLine = l.split()
+            if (not splitLine
+                    or '--' in splitLine[0] 
+                    or splitLine[0].isalpha() 
+                    or '(' in splitLine[0]):
+                line = f.readline()
+                continue
+
+            splitLine[0] = str(int(splitLine[0]) + MAX_USER_ID)
+            out.writerow(splitLine)
+            line = f.readline()
 
 
 def processCheckins():
@@ -80,7 +100,9 @@ def main():
     warning = """
     WARNING: This will overwrite existing .tsv dataset at ' + path. Continue?
     """
-    userInput = raw_input(warning)
+    # TODO
+    #  userInput = raw_input(warning)
+    userInput = 'y'
     if userInput == 'y' or userInput == 'Y' or userInput == 'yes' or userInput == 'Yes':
         processUsers()
         processCheckins()

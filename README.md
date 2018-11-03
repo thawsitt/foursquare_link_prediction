@@ -1,7 +1,13 @@
 # Link Prediction on Foursquare Dataset
 
-## Links
+## Processing Dataset for Snap
+Instructions:
+- Download dataset (the link can be found below)
+- Unzip and place entire *umn_foursquare_datasets* folder in cs224w_project master directory
+- Run script
 
+
+## Links
 - Class website: http://web.stanford.edu/class/cs224w/info.html
 - Dataset: [UMN/Sarwat Foursquare Dataset](https://archive.org/details/201309_foursquare_dataset_umn)
 - Sample **proposal** for reference: [Link Prediction in Pinterest Network](http://snap.stanford.edu/cs224w-17-data/best-proposals-16/cs224w-project-proposal-poorna-amelia-viswa.pdf)

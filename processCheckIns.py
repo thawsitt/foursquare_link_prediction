@@ -6,7 +6,7 @@ Date created: 11/04/2018
 
 Input: Foursquare "checkins" dataset
 Output: Text file with user_id and venue_id columns e.g. "11234 3435322"
-Note: max_user_id is added to venue ids to eliminate overlap between user and venue ids. 
+Note: max_user_id is added to venue ids to eliminate overlap between user and venue ids.
 """
 # Number of unique users: 485381
 # Number of unique venues: 83999
@@ -15,10 +15,12 @@ Note: max_user_id is added to venue ids to eliminate overlap between user and ve
 
 def processCheckins(max_user_id):
     input_filename = 'umn_foursquare_datasets/checkins.dat'
-    output_filename = 'umn_foursquare_datasets/checkins.txt'
+    # output_filename = 'umn_foursquare_datasets/checkins.txt'
+    training = 'umn_foursquare_datasets/training_set.txt'
+    testing = 'umn_foursquare_datasets/test_set.txt'
     users, venues = set(), set()
-
-    with open(input_filename, 'r') as input, open(output_filename, 'w') as output:
+    mid = 1021966 // 2
+    with open(input_filename, 'r') as input, open(training, 'w') as train, open(testing, 'w') as test:
         for i, line in enumerate(input):
             if i > 1:
                 parsed = [str.strip() for str in line.split('|')]
@@ -29,7 +31,10 @@ def processCheckins(max_user_id):
                 venue_id = int(parsed[2]) + max_user_id
                 users.add(user_id)
                 venues.add(venue_id)
-                output.write('{}\t{}\n'.format(user_id, venue_id))
+                if i > mid:
+                    test.write('{}\t{}\n'.format(user_id, venue_id))
+                else:
+                    train.write('{}\t{}\n'.format(user_id, venue_id))
 
     print('Number of unique users: {}'.format(len(users)))
     print('Number of unique venues: {}'.format(len(venues)))

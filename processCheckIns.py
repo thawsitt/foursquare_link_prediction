@@ -38,17 +38,21 @@ def read_input(input_filename, max_user_id):
 
 def write_output_files(user_venue_pairs, split_train_test, percent_train, output_filenames):
     all, train, test = output_filenames
-    total_pairs = len(user_venue_pairs)
-    cutoff_index = int(total_pairs * percent_train)
-    with open(all, 'w') as checkins, open(train, 'w') as training_set, open(test, 'w') as test_set:
-        for i, pair in enumerate(user_venue_pairs):
-            user_id, venue_id = pair
-            if not split_train_test:
+    if split_train_test:
+        total_pairs = len(user_venue_pairs)
+        cutoff_index = int(total_pairs * percent_train)
+        with open(train, 'w') as training_set, open(test, 'w') as test_set:
+            for i, pair in enumerate(user_venue_pairs):
+                user_id, venue_id = pair
+                if i < cutoff_index:
+                    training_set.write('{}\t{}\n'.format(user_id, venue_id))
+                else:
+                    test_set.write('{}\t{}\n'.format(user_id, venue_id))
+    else:
+        with open(all, 'w') as checkins:
+            for i, pair in enumerate(user_venue_pairs):
+                user_id, venue_id = pair
                 checkins.write('{}\t{}\n'.format(user_id, venue_id))
-            elif i < cutoff_index:
-                training_set.write('{}\t{}\n'.format(user_id, venue_id))
-            else:
-                test_set.write('{}\t{}\n'.format(user_id, venue_id))
 
 
 def print_metrics(users, venues):
@@ -59,12 +63,12 @@ def print_metrics(users, venues):
 
 
 def main():
-    max_user_id = 2153502 # pre-computed
     input_filename = 'umn_foursquare_datasets/checkins.dat'
     output_all = 'umn_foursquare_datasets/checkins.txt'
     output_train = 'umn_foursquare_datasets/train.txt'
     output_test = 'umn_foursquare_datasets/test.txt'
-    split_train_test = True
+    max_user_id = 2153502 # pre-computed
+    split_train_test = True # Set to False to get only one output file
 
     user_venue_pairs = read_input(input_filename, max_user_id)
     write_output_files(user_venue_pairs, split_train_test, 0.5, (output_all, output_train, output_test))

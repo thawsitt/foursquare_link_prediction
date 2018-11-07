@@ -22,21 +22,25 @@ def plot_degree_distribution(graph):
     plt.title('Degree Distribution of Foursquare Checkins Network')
     plt.show()
 
-def train(graph, users, venues):
-    distances = []
+def train(graph, users, venues, score_fn):
+    scores = []
     max_wcc = get_nodes_in_max_wcc(graph)
     for u in users:
         print('Finding distances for user: {}'.format(u))
         for v in venues:
             if u in max_wcc and v in max_wcc:
-                distance = get_distance(graph, u, v)
-                distances.append(((u, v), distance))
-                # print('Distance between nodes {}: {}'.format((u,v), distance))
-    for item in sorted(distances, key=lambda x: x[1]):
+                score = score_fn(graph, u, v)
+                scores.append(((u, v), score))
+                # print('Score for nodes {}: {}'.format((u,v), score))
+    for item in sorted(scores, key=lambda x: x[1], reverse=True):
         print(item)
 
-    with open('distances.pickle', 'w') as file:
-        pickle.dump(distances, file, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('scores.pickle', 'w') as file:
+        pickle.dump(scores, file, protocol=pickle.HIGHEST_PROTOCOL)
+
+#*******************************************************************************
+# Score functions
+#*******************************************************************************
 
 def get_distance(graph, u, v):
     S, D = set([u]), set([v])
@@ -50,6 +54,11 @@ def get_distance(graph, u, v):
         smaller_set.update(new_nodes)
         num_steps += 1
     return num_steps * -1
+
+def get_num_common_neighbors(graph, u, v):
+    n1 = get_neighbors(graph.GetNI(u))
+    n2 = get_neighbors(graph.GetNI(v))
+    return len(n1.intersection(n2))
 
 #*******************************************************************************
 # Helper functions
@@ -96,10 +105,12 @@ def get_nodes_in_max_wcc(graph):
 
 def main():
     users, venues = load_pickles()
+    score_fn = get_num_common_neighbors
+
     graph = load_graph('checkins.txt')
     print_connected_components(graph)
-    # plot_degree_distribution(graph)
-    train(graph, users, venues)
+    plot_degree_distribution(graph)
+    train(graph, users, venues, score_fn)
 
 if __name__ == '__main__':
     main()

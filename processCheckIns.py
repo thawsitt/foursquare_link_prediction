@@ -16,6 +16,8 @@ Notes:
 # Max user id: 2153502
 # Min venue id: 2153503
 
+import cPickle as pickle
+
 
 def read_input(input_filename, max_user_id):
     user_venue_pairs = []
@@ -31,6 +33,13 @@ def read_input(input_filename, max_user_id):
             users.add(user_id)
             venues.add(venue_id)
             user_venue_pairs.append((user_id, venue_id))
+
+    # Save users and venues objects for future use
+    with open('code/user_ids.pickle', 'w') as file:
+        pickle.dump(users, file, protocol=pickle.HIGHEST_PROTOCOL)
+    with open('code/venue_ids.pickle', 'w') as file:
+        pickle.dump(venues, file, protocol=pickle.HIGHEST_PROTOCOL)
+
     print_metrics(users, venues)
     assert(len(users.intersection(venues)) == 0)
     return user_venue_pairs
@@ -64,9 +73,9 @@ def print_metrics(users, venues):
 
 def main():
     input_filename = 'umn_foursquare_datasets/checkins.dat'
-    output_all = 'umn_foursquare_datasets/checkins.txt'
-    output_train = 'umn_foursquare_datasets/train.txt'
-    output_test = 'umn_foursquare_datasets/test.txt'
+    output_all = 'code/checkins.txt'
+    output_train = 'code/train.txt'
+    output_test = 'code/test.txt'
     max_user_id = 2153502 # pre-computed
     split_train_test = True # Set to False to get only one output file
 

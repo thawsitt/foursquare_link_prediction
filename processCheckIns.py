@@ -18,7 +18,6 @@ Notes:
 
 import cPickle as pickle
 
-
 def read_input(input_filename, max_user_id):
     user_venue_pairs = []
     users, venues = set(), set()
@@ -76,8 +75,8 @@ def main():
     output_all = 'code/checkins.txt'
     output_train = 'code/train.txt'
     output_test = 'code/test.txt'
-    max_user_id = 2153502 # pre-computed
-    split_train_test = True # Set to False to get only one output file
+    max_user_id = 2153502   # pre-computed
+    split_train_test = False # Set to False to get only one output file
 
     user_venue_pairs = read_input(input_filename, max_user_id)
     write_output_files(user_venue_pairs, split_train_test, 0.5, (output_all, output_train, output_test))

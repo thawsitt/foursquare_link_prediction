@@ -52,11 +52,12 @@ def output_data(filename, user_venue_pairs):
 
 def write_pickles(pickle_users, pickle_venues, users_venues):
     users, venues = zip(*users_venues)
+    users_set, venues_set = set(users), set(venues)
     assert len(users) == len(venues)
     with open(pickle_users, 'w') as file:
-        pickle.dump(users, file, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(users_set, file, protocol=pickle.HIGHEST_PROTOCOL)
     with open(pickle_venues, 'w') as file:
-        pickle.dump(venues, file, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(venues_set, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def main():

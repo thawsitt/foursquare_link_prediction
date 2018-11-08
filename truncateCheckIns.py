@@ -9,11 +9,13 @@ only a single checkin.
 
 Output: File checkinsTrunc.txt, the truncated list of checkins.txt
 """
+
 # Original number of unique users: 485381
 # Original number of unique venues: 83999
 # Max user id: 2153502
 # Min venue id: 2153503
 
+import cPickle as pickle
 
 def remove_single_checkins(filename):
     user_checkin_venues = {}
@@ -47,12 +49,26 @@ def output_data(filename, user_venue_pairs):
             checkins.write('{}\t{}\n'.format(user_id, venue_id))
 
 
+
+def write_pickles(pickle_users, pickle_venues, users_venues):
+    users, venues = zip(*users_venues)
+    assert len(users) == len(venues)
+    with open(pickle_users, 'w') as file:
+        pickle.dump(users, file, protocol=pickle.HIGHEST_PROTOCOL)
+    with open(pickle_venues, 'w') as file:
+        pickle.dump(venues, file, protocol=pickle.HIGHEST_PROTOCOL)
+
+
 def main():
+    path = 'code/'
     infile = 'checkins.txt'
     outfile = 'checkinsTrunc.txt'
-    path = 'code/'
+    pickle_users = 'user_ids_trunc.pickle'
+    pickle_venues = 'venue_ids_trunc.pickle'
+
     checkinsTrunc = remove_single_checkins(path + infile)
     output_data(path + outfile, checkinsTrunc)
+    write_pickles(path + pickle_users, path + pickle_venues, checkinsTrunc)
 
 
 if __name__ == '__main__':

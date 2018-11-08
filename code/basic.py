@@ -71,7 +71,7 @@ def get_neighbors(NI):
         neighbors.add(neighbor_node_id)
     return neighbors
 
-def load_pickles():
+def load_pickles(users_pickle, venues_pickle):
     # Load user IDs and venue IDs sets from pickle objects
     with open('user_ids.pickle', 'r') as file:
         users = pickle.load(file)
@@ -104,10 +104,20 @@ def get_nodes_in_max_wcc(graph):
 #*******************************************************************************
 
 def main():
-    users, venues = load_pickles()
-    score_fn = get_num_common_neighbors
+    #  checkins_txt = 'checkins.txt'
+    #  users_pickle = 'users_ids.pickle'
+    #  venues_pickle = 'venue_ids.pickle'
+    checkins_file = 'checkinsTrunc.txt'
+    users_pickle = 'users_ids_trunc.pickle'
+    venues_pickle = 'venue_ids_trunc.pickle'
 
-    graph = load_graph('checkins.txt')
+    users, venues = load_pickles(users_pickle, venues_pickle)
+
+    score_fn = get_distance
+    #  score_fn = get_num_common_neighbors
+
+    graph = load_graph(checkins_file)
+
     print_connected_components(graph)
     plot_degree_distribution(graph)
     train(graph, users, venues, score_fn)

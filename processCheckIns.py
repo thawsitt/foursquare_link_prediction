@@ -1,7 +1,7 @@
 """
 processCheckIns.py
 ------------------
-Author: Thawsitt Naing
+Author: Thawsitt Naing, Francisco Izaguirre
 Date created: 11/04/2018
 
 Input: Foursquare "checkins" dataset
@@ -10,13 +10,40 @@ Output: Text file with user_id and venue_id columns e.g. "11234 3435322"
 Notes:
 - max_user_id is added to venue ids to eliminate overlap between user and venue ids.
 - Tested with Python 2.7
+
+Number of unique users: 485381
+Number of unique venues: 83999
+Max user id: 2153502
+Min venue id: 2153503
+
+checkins.dat header
+id | user_id | venue_id | latitude | longitude | created_at      
 """
-# Number of unique users: 485381
-# Number of unique venues: 83999
-# Max user id: 2153502
-# Min venue id: 2153503
 
 import cPickle as pickle
+from geopy.geocoder import Nominatim
+
+geolocator = Nominatim(user_agent="224W_Project")
+
+'''
+Checks whether coordinates point to a location in California.
+Last three 
+Input:  Accepts two strings for long and lat. 
+Returns: False if None or empty string.
+'''
+# TODO Remove first line when ready to use
+def located_in_CA(latitude, longitude):
+    return True
+    if not latitude or not longitude:
+        return False
+    coords = '%s, %s' % (latitude, longitude)
+    location = geolocator.reverse(coords)
+    addr = location.split(' ,')
+    # last 3 in list are 'state, zip code, USA'
+    state = addr[-3]
+    country = addr[-1]
+    return state == 'California' and country == 'USA'
+
 
 def read_input(input_filename, max_user_id):
     user_venue_pairs = []
@@ -29,9 +56,13 @@ def read_input(input_filename, max_user_id):
                 continue
             user_id = int(parsed[1])
             venue_id = int(parsed[2]) + max_user_id
-            users.add(user_id)
-            venues.add(venue_id)
-            user_venue_pairs.append((user_id, venue_id))
+            latitude = parsed[3]
+            longitude = parsed[4]
+            # California checkins only
+            if located_in_CA(latitude, longitude):
+                users.add(user_id)
+                venues.add(venue_id)
+                user_venue_pairs.append((user_id, venue_id))
 
     # Save users and venues objects for future use
     with open('code/user_ids.pickle', 'w') as file:

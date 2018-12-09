@@ -49,7 +49,7 @@ Returns: False if None or empty string.
 '''
 
 MAX_USER_ID = 2153502   # pre-computed
-SPLIT_TRAIN_TEST = False # Set to False to get only one output file
+SPLIT_TRAIN_TEST = True # Set to False to get only one output file
 
 class Filetype(Enum):
     DAT = 0,
@@ -205,24 +205,23 @@ def getAdjacentUsers(G, venue):
 
 def main():
     # Read checkins and write output files
-    print 'Reading checkins form {}'.format(Datafiles[Datafile.CHECKINS_DAT])
-    edges = read_input(Datafiles[Datafile.CHECKINS_DAT], MAX_USER_ID)
-    if SPLIT_TRAIN_TEST:
-        print 'Splitting into train/test sets...'
-        trainData, testData = splitTrainTest(edges, 0.5)
-        print 'Writing train file {}'.format(Datafiles[Datafile.TRAIN_TXT])
-        writeFile(Datafiles[Datafile.TRAIN_TXT], trainData, Filetype.TXT)
-        print 'Writing test file {}'.format(Datafiles[Datafile.TEST_TXT])
-        writeFile(Datafiles[Datafile.TEST_TXT], testData, Filetype.TXT)
+    # print 'Reading checkins form {}'.format(Datafiles[Datafile.CHECKINS_DAT])
+    # edges = read_input(Datafiles[Datafile.CHECKINS_DAT], MAX_USER_ID)
+    # print 'Writing all checkins to {}'.format(Datafiles[Datafile.CHECKINS_TXT])
+    # writeFile(Datafiles[Datafile.CHECKINS_TXT], edges, Filetype.TXT)
 
-    print 'Writing all checkins to {}'.format(Datafiles[Datafile.CHECKINS_TXT])
-    writeFile(Datafiles[Datafile.CHECKINS_TXT], edges, Filetype.TXT)
-
-    minDegree = 9
+    minDegree = 8
     sampleEdges = sampleDatasetBFS(Datafiles[Datafile.CHECKINS_TXT], minDegree)
     print 'Writing sampled checkins to {}'.format(
             Datafiles[Datafile.SAMPLE_CKNS_TXT])
     writeFile(Datafiles[Datafile.SAMPLE_CKNS_TXT], sampleEdges, Filetype.TXT)
+    if SPLIT_TRAIN_TEST:
+        print 'Splitting into train/test sets...'
+        trainData, testData = splitTrainTest(sampleEdges, 0.8)
+        print 'Writing train file {}'.format(Datafiles[Datafile.TRAIN_TXT])
+        writeFile(Datafiles[Datafile.TRAIN_TXT], trainData, Filetype.TXT)
+        print 'Writing test file {}'.format(Datafiles[Datafile.TEST_TXT])
+        writeFile(Datafiles[Datafile.TEST_TXT], testData, Filetype.TXT)
     print 'Sampling complete!'
 
 if __name__ == '__main__':

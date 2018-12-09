@@ -3,4 +3,5 @@ data
 *.swp
 *.dat
 *.txt
+*.pyc
 fsq.zip

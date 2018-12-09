@@ -29,14 +29,33 @@ def distance(graph, x, y):
     return num_steps * -1
 
 
-def num_common_neighbors(graph, x, y):
+def num_common_neighbors_user(graph, user, venue):
     """
-    The number of common neighbors between x and y.
+    The number of common neighbors. For bipartite network, we adapt this as:
+    max(N(user) intersect N(user_i)) for all user_i in N(venue)
+    where N(x) means neighbors of x.
     """
-    n1 = get_neighbors(graph.GetNI(x))
-    n2 = get_neighbors(graph.GetNI(y))
-    assert len(n1.intersection(n2)) == 0
-    return 0
+    n1 = get_neighbors(graph.GetNI(user))
+    max_score = 0
+    for user_i in get_neighbors(graph.GetNI(venue)):
+        n2 = get_neighbors(graph.GetNI(user_i))
+        score = len(n1.intersection(n2))
+        max_score = max(score, max_score)
+    return max_score
+
+def num_common_neighbors_venue(graph, user, venue):
+    """
+    The number of common neighbors. For bipartite network, we adapt this as:
+    max(N(venue) intersect N(venue_i)) for all venue_i in N(user)
+    where N(x) means neighbors of x.
+    """
+    n1 = get_neighbors(graph.GetNI(venue))
+    max_score = 0
+    for venue_i in get_neighbors(graph.GetNI(user)):
+        n2 = get_neighbors(graph.GetNI(venue_i))
+        score = len(n1.intersection(n2))
+        max_score = max(score, max_score)
+    return max_score
 
 
 def jaccard_coefficient(graph, x, y):

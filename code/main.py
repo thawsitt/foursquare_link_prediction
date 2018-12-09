@@ -1,12 +1,15 @@
 import snap
 import heuristics
+import time
 
 def train(graph, users, venues, score_fn):
+    start = time.clock()
     scores = []
     for u in users:
         for v in venues:
             score = score_fn(graph, u, v)
             scores.append(((u, v), score))
+    print('Calculations complete! Time taken: {}s'.format(time.clock() - start))
     print('Top 10 most similar nodes')
     for item in sorted(scores, key=lambda x: -x[1])[:10]:
         print(item)
@@ -14,7 +17,7 @@ def train(graph, users, venues, score_fn):
 def main():
     graph = load_graph('../data/processed/sampled_checkins.txt')
     users, venues = split_user_venues(graph)
-    score_fn = heuristics.distance
+    score_fn = heuristics.num_common_neighbors_venue
     train(graph, users, venues, score_fn)
 
 #*******************************************************************************

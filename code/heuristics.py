@@ -5,6 +5,7 @@ Contains various similarity metrics used in link prediction.
 """
 
 import snap
+from collections import Counter
 from math import log
 
 
@@ -91,6 +92,35 @@ def preferential_attachment(graph, x, y):
     degree_x = graph.GetNI(x).GetDeg()
     degree_y = graph.GetNI(y).GetDeg()
     return degree_x * degree_y
+
+
+def katz(graph, x, y):
+    """
+    Katz (Exponentially Damped Path Counts)
+    """
+    neighbor_cache = {}
+    beta = 0.5
+    path_lengths = {}
+    path_length = 1
+    nodes_to_explore = [x]
+    while path_length < 4:
+        new_nodes_to_explore = []
+        for node in nodes_to_explore:
+            if node in neighbor_cache:
+                neighbors = neighbor_cache[node]
+            else:
+                neighbors = get_neighbors(graph.GetNI(node))
+                neighbor_cache[node] = neighbors
+            new_nodes_to_explore.extend(list(neighbors))
+        path_lengths[path_length] = Counter(new_nodes_to_explore)[y]
+        nodes_to_explore = new_nodes_to_explore
+        path_length += 1
+    score = 0
+    for l in path_lengths:
+        score += beta**l * path_lengths[l]
+    return score
+
+
 
 #*******************************************************************************
 # Helper functions

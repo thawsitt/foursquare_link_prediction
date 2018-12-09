@@ -33,10 +33,13 @@ def validate(edges, scores):
             TP += 1
         else:
             FP += 1
+    FN = len(edges) - TP
     print('# TP: {}'.format(TP))
     print('# FP: {}'.format(FP))
     print('# edges in test: {}'.format(len(edges)))
     print('Accuracy: {0:.2f}%'.format(TP * 100.0 / len(edges)))
+    print('Precision: {0:.2f}%'.format(float(TP) / (TP + FP)))
+    print('Recall: {0:.2f}%'.format(float(TP) / (TP + FN)))
 
 def remove_edges(training_graph):
     # Train: 80%, Test: 20%
@@ -63,7 +66,7 @@ def main():
         3: heuristics.preferential_attachment,
         4: heuristics.katz
     }
-    SCORE_FN = score_fns[2]
+    SCORE_FN = score_fns[4]
     training_graph = load_graph('../data/processed/sampled_checkins.txt')
     edges = remove_edges(training_graph)
     users, venues = split_user_venues(training_graph)

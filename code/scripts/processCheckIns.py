@@ -164,7 +164,7 @@ def sampleDatasetBFS(edgeList, minDeg):
     while True:
         nodesToDel = snap.TIntV()
         for n in G.Nodes():
-            if n.GetDeg() < minDeg:
+            if n.GetDeg() <= minDeg:
                 nodesToDel.Add(n.GetId())
         if nodesToDel.Len() == 0:
             break
@@ -210,8 +210,8 @@ def main():
     # print 'Writing all checkins to {}'.format(Datafiles[Datafile.CHECKINS_TXT])
     # writeFile(Datafiles[Datafile.CHECKINS_TXT], edges, Filetype.TXT)
 
-    minDegree = 8
-    sampleEdges = sampleDatasetBFS(Datafiles[Datafile.CHECKINS_TXT], minDegree)
+    MIN_DEGREE = 7
+    sampleEdges = sampleDatasetBFS(Datafiles[Datafile.CHECKINS_TXT], MIN_DEGREE)
     print 'Writing sampled checkins to {}'.format(
             Datafiles[Datafile.SAMPLE_CKNS_TXT])
     writeFile(Datafiles[Datafile.SAMPLE_CKNS_TXT], sampleEdges, Filetype.TXT)

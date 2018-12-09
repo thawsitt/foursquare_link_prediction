@@ -1,6 +1,7 @@
 import snap
 import heuristics
 import time
+import random
 
 def train(graph, users, venues, score_fn):
     print('Calculating scores for the training set...')
@@ -8,8 +9,6 @@ def train(graph, users, venues, score_fn):
     scores = []
     for u in users:
         for v in venues:
-            # if graph.IsEdge(u, v):
-            #     continue
             score = score_fn(graph, u, v)
             scores.append(((u, v), score))
     print('Calculations complete! Time taken: {}s'.format(time.clock() - start))
@@ -19,30 +18,38 @@ def train(graph, users, venues, score_fn):
         print(item)
     return scores
 
-def validate(test_graph, scores):
+def validate(edges, scores):
     TP = 0
     FP = 0
-    cutoff = int(len(scores) * 0.5)
+    cutoff = int(len(scores) * 0.2)
+    # Take top 20% of the scores
     for node_pair, score in scores[:cutoff]:
         u, v = node_pair
-        if test_graph.IsEdge(u, v):
+        if (u, v) in edges or (v, u) in edges:
             TP += 1
         else:
             FP += 1
     print('# TP: {}'.format(TP))
     print('# FP: {}'.format(FP))
-    print('# edges in test: {}'.format(test_graph.GetEdges()))
-    print('Accuracy: {0:.2f}%'.format(TP * 100.0 / test_graph.GetEdges()))
+    print('# edges in test: {}'.format(len(edges)))
+    print('Accuracy: {0:.2f}%'.format(TP * 100.0 / len(edges)))
 
-def insert_dangling_nodes(training_graph, test_graph):
-    num_nodes = 0
-    for node in test_graph.Nodes():
-        node_id = node.GetId()
-        if training_graph.IsNode(node_id):
-            num_nodes += 1
-        else:
-            training_graph.AddNode(node_id)
-    print('{0:.2f}% of test nodes appear in training graph.'.format(num_nodes * 100.0 / test_graph.GetNodes()))
+def remove_edges(training_graph):
+    # Train: 80%, Test: 20%
+    num_edges_to_remove = int(training_graph.GetEdges() * 0.2)
+    nodes = [node.GetId() for node in training_graph.Nodes()]
+    removed_edges = set()
+    while num_edges_to_remove > 0:
+        node = random.choice(nodes)
+        NI = training_graph.GetNI(node)
+        if NI.GetDeg() < 2:
+            continue
+        neighbors = get_neighbors(NI)
+        random_neighbor = random.choice(tuple(neighbors))
+        training_graph.DelEdge(node, random_neighbor)
+        removed_edges.add((node, random_neighbor))
+        num_edges_to_remove -= 1
+    return removed_edges
 
 def main():
     score_fns = {
@@ -51,12 +58,11 @@ def main():
         2: heuristics.num_common_neighbors_venue,
     }
     SCORE_FN = score_fns[2]
-    training_graph = load_graph('../data/training/train.txt')
-    test_graph = load_graph('../data/test/test.txt')
-    insert_dangling_nodes(training_graph, test_graph)
+    training_graph = load_graph('../data/processed/sampled_checkins.txt')
+    edges = remove_edges(training_graph)
     users, venues = split_user_venues(training_graph)
     scores = train(training_graph, users, venues, SCORE_FN)
-    validate(test_graph, scores)
+    validate(edges, scores)
 
 #*******************************************************************************
 # Helper functions
@@ -79,6 +85,13 @@ def split_user_venues(graph):
         else:
             venues.add(id)
     return users, venues
+
+def get_neighbors(NI):
+    neighbors = set()
+    for i in range(NI.GetDeg()):
+        neighbor_node_id = NI.GetNbrNId(i)
+        neighbors.add(neighbor_node_id)
+    return neighbors
 
 if __name__ == '__main__':
     main()

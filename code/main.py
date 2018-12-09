@@ -14,7 +14,7 @@ def train(graph, users, venues, score_fn):
             scores.append(((u, v), score))
     print('Calculations complete! Time taken: {}s'.format(time.clock() - start))
     print('Top 10 most similar nodes')
-    scores.sort(key=lambda x: -x[1])
+    scores.sort(key=lambda x: x[1], reverse=True)
     for item in scores[:10]:
         print(item)
     return scores
@@ -22,7 +22,7 @@ def train(graph, users, venues, score_fn):
 def validate(test_graph, scores):
     TP = 0
     FP = 0
-    cutoff = len(scores)
+    cutoff = int(len(scores) * 0.5)
     for node_pair, score in scores[:cutoff]:
         u, v = node_pair
         if test_graph.IsEdge(u, v):
@@ -31,12 +31,29 @@ def validate(test_graph, scores):
             FP += 1
     print('# TP: {}'.format(TP))
     print('# FP: {}'.format(FP))
-    print('Accuracy: {}%'.format(TP * 100.0 / test_graph.GetEdges()))
+    print('# edges in test: {}'.format(test_graph.GetEdges()))
+    print('Accuracy: {0:.2f}%'.format(TP * 100.0 / test_graph.GetEdges()))
+
+def insert_dangling_nodes(training_graph, test_graph):
+    num_nodes = 0
+    for node in test_graph.Nodes():
+        node_id = node.GetId()
+        if training_graph.IsNode(node_id):
+            num_nodes += 1
+        else:
+            training_graph.AddNode(node_id)
+    print('{0:.2f}% of test nodes appear in training graph.'.format(num_nodes * 100.0 / test_graph.GetNodes()))
 
 def main():
-    SCORE_FN = heuristics.num_common_neighbors_venue
+    score_fns = {
+        0: heuristics.distance,
+        1: heuristics.num_common_neighbors_user,
+        2: heuristics.num_common_neighbors_venue,
+    }
+    SCORE_FN = score_fns[2]
     training_graph = load_graph('../data/training/train.txt')
     test_graph = load_graph('../data/test/test.txt')
+    insert_dangling_nodes(training_graph, test_graph)
     users, venues = split_user_venues(training_graph)
     scores = train(training_graph, users, venues, SCORE_FN)
     validate(test_graph, scores)

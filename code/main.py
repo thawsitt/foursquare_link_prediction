@@ -7,11 +7,15 @@ def train(graph, users, venues, score_fn):
     print('Calculating scores for the training set...')
     start = time.clock()
     scores = []
+    num_iterations = 0
     for u in users:
         for v in venues:
             score = score_fn(graph, u, v)
             scores.append(((u, v), score))
-    print('Calculations complete! Time taken: {}s'.format(time.clock() - start))
+            num_iterations += 1
+            if (num_iterations % 1000 == 0):
+                print('Time taken: {0:.2f}s, # iterations: {1}'.format(time.clock() - start, num_iterations))
+    print('Calculations complete! Time taken: {0:.2f}s'.format(time.clock() - start))
     print('Top 10 most similar nodes')
     scores.sort(key=lambda x: x[1], reverse=True)
     for item in scores[:10]:
@@ -56,8 +60,10 @@ def main():
         0: heuristics.distance,
         1: heuristics.num_common_neighbors_user,
         2: heuristics.num_common_neighbors_venue,
+        3: heuristics.preferential_attachment,
+        4: heuristics.katz
     }
-    SCORE_FN = score_fns[2]
+    SCORE_FN = score_fns[4]
     training_graph = load_graph('../data/processed/sampled_checkins.txt')
     edges = remove_edges(training_graph)
     users, venues = split_user_venues(training_graph)

@@ -17,7 +17,7 @@ Max user id: 2153502
 Min venue id: 2153503
 
 checkins.dat header
-id | user_id | venue_id | latitude | longitude | created_at      
+id | user_id | venue_id | latitude | longitude | created_at
 
 Fraction of nodes in Max WCC = TODO
 
@@ -43,8 +43,8 @@ import snap
 
 '''
 Checks whether coordinates point to a location in California.
-Last three 
-Input:  Accepts two strings for long and lat. 
+Last three
+Input:  Accepts two strings for long and lat.
 Returns: False if None or empty string.
 '''
 
@@ -54,28 +54,28 @@ SPLIT_TRAIN_TEST = False # Set to False to get only one output file
 class Filetype(Enum):
     DAT = 0,
     PICKLE = 1,
-    TXT = 2 
+    TXT = 2
 
 
 class Datafile(Enum):
     CHECKINS_DAT = 0,
     CHECKINS_TXT = 1,
     SAMPLE_CKNS_TXT = 2,
-    TEST_TXT = 3, 
+    TEST_TXT = 3,
     TRAIN_TXT = 4,
     USERS_PICKLE = 5,
     VENUES_PICKLE = 6
 
 
 Datafiles = {
-        Datafile.CHECKINS_TXT    : '../../data/processed/checkins.txt',
-        Datafile.CHECKINS_DAT    : '../../data/umn_foursquare_datasets/checkins.dat',
-        Datafile.SAMPLE_CKNS_TXT : '../../data/processed/sampled_checkins.txt',
-        Datafile.TEST_TXT        : '../../data/test/test.txt',
-        Datafile.TRAIN_TXT       : '../../data/training/train.txt',
-        Datafile.USERS_PICKLE    : '../../data/pickles/user_ids.pickle',
-        Datafile.VENUES_PICKLE   : '../../data/pickles/venue_ids.pickle',
-        }
+    Datafile.CHECKINS_TXT    : '../../data/processed/checkins.txt',
+    Datafile.CHECKINS_DAT    : '../../data/umn_foursquare_datasets/checkins.dat',
+    Datafile.SAMPLE_CKNS_TXT : '../../data/processed/sampled_checkins.txt',
+    Datafile.TEST_TXT        : '../../data/test/test.txt',
+    Datafile.TRAIN_TXT       : '../../data/training/train.txt',
+    Datafile.USERS_PICKLE    : '../../data/pickles/user_ids.pickle',
+    Datafile.VENUES_PICKLE   : '../../data/pickles/venue_ids.pickle',
+}
 
 
 # Makes directory for filename if it doesn't exist
@@ -103,7 +103,7 @@ def writeFile(filename, data, filetype, header=None):
                         file.write('{}\n'.format(elem))
                     else:
                         file.write('{} '.format(elem))
-            
+
     elif filetype == Filetype.PICKLE:
         with open(filename, 'w') as file:
             pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
@@ -142,7 +142,7 @@ def read_input(input_filename, MAX_USER_ID):
     return user_venue_edges
 
 
-def splitTrainTest(edges, persent_train):
+def splitTrainTest(edges, percent_train):
     total_pairs = len(edges)
     cutoff_index = int(total_pairs * percent_train)
     testEdges, trainEdges = [], []
@@ -227,4 +227,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -16,6 +16,7 @@ def distance(graph, x, y):
     expanded ring search to compute the shortest path distance from
     x to y efficiently.
     """
+    assert(snap.IsConnected(graph))
     S, D = set([x]), set([y])
     num_steps = 0
     while len(S.intersection(D)) == 0:

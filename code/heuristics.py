@@ -9,7 +9,7 @@ from collections import Counter
 from math import log
 
 
-def distance(graph, x, y):
+def distance(graph, x, y, neighbor_dict):
     """
     Negative of the shortest path distance from x to y.
 
@@ -24,38 +24,38 @@ def distance(graph, x, y):
         smaller_set = S if len(S) < len(D) else D
         new_nodes = set()
         for node in smaller_set:
-            for neighbor in get_neighbors(graph.GetNI(node)):
+            for neighbor in neighbor_dict[node]:
                 new_nodes.add(neighbor)
         smaller_set.update(new_nodes)
         num_steps += 1
     return num_steps * -1
 
 
-def num_common_neighbors_user(graph, user, venue):
+def num_common_neighbors_user(graph, user, venue, neighbor_dict):
     """
     The number of common neighbors. For bipartite network, we adapt this as:
     max(N(user) intersect N(user_i)) for all user_i in N(venue)
     where N(x) means neighbors of x.
     """
-    n1 = get_neighbors(graph.GetNI(user))
+    s1 = set(neighbor_dict[user])
     max_score = 0
-    for user_i in get_neighbors(graph.GetNI(venue)):
-        n2 = get_neighbors(graph.GetNI(user_i))
-        score = len(n1.intersection(n2))
+    for user_i in neighbor_dict[venue]:
+        s2 = set(neighbor_dict[user_i])
+        score = len(s1.intersection(s2))
         max_score = max(score, max_score)
     return max_score
 
-def num_common_neighbors_venue(graph, user, venue):
+def num_common_neighbors_venue(graph, user, venue, neighbor_dict):
     """
     The number of common neighbors. For bipartite network, we adapt this as:
     max(N(venue) intersect N(venue_i)) for all venue_i in N(user)
     where N(x) means neighbors of x.
     """
-    n1 = get_neighbors(graph.GetNI(venue))
+    s1 = set(neighbor_dict[venue])
     max_score = 0
-    for venue_i in get_neighbors(graph.GetNI(user)):
-        n2 = get_neighbors(graph.GetNI(venue_i))
-        score = len(n1.intersection(n2))
+    for venue_i in neighbor_dict[user]:
+        s2 = set(neighbor_dict[venue_i])
+        score = len(s1.intersection(s2))
         max_score = max(score, max_score)
     return max_score
 
@@ -85,7 +85,7 @@ def adamic_adar(graph, x, y):
     return weighted_score
 
 
-def preferential_attachment(graph, x, y):
+def preferential_attachment(graph, x, y, neighbor_dict):
     """
     Degree(x) * Degree(y)
     """
@@ -94,23 +94,19 @@ def preferential_attachment(graph, x, y):
     return degree_x * degree_y
 
 
-def katz(graph, x, y):
+def katz(graph, x, y, neighbor_dict):
     """
     Katz (Exponentially Damped Path Counts)
     """
     neighbor_cache = {}
-    beta = 0.5
+    beta = 0.005
     path_lengths = {}
     path_length = 1
     nodes_to_explore = [x]
     while path_length < 4:
         new_nodes_to_explore = []
         for node in nodes_to_explore:
-            if node in neighbor_cache:
-                neighbors = neighbor_cache[node]
-            else:
-                neighbors = get_neighbors(graph.GetNI(node))
-                neighbor_cache[node] = neighbors
+            neighbors = neighbor_dict[node]
             new_nodes_to_explore.extend(list(neighbors))
         path_lengths[path_length] = Counter(new_nodes_to_explore)[y]
         nodes_to_explore = new_nodes_to_explore
@@ -119,16 +115,3 @@ def katz(graph, x, y):
     for l in path_lengths:
         score += beta**l * path_lengths[l]
     return score
-
-
-
-#*******************************************************************************
-# Helper functions
-#*******************************************************************************
-
-def get_neighbors(NI):
-    neighbors = set()
-    for i in range(NI.GetDeg()):
-        neighbor_node_id = NI.GetNbrNId(i)
-        neighbors.add(neighbor_node_id)
-    return neighbors

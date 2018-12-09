@@ -3,14 +3,14 @@ import heuristics
 import time
 import random
 
-def train(graph, users, venues, score_fn):
+def train(graph, users, venues, score_fn, neighbor_dict):
     print('Calculating scores for the training set...')
     start = time.clock()
     scores = []
     num_iterations = 0
     for u in users:
         for v in venues:
-            score = score_fn(graph, u, v)
+            score = score_fn(graph, u, v, neighbor_dict)
             scores.append(((u, v), score))
             num_iterations += 1
             if (num_iterations % 1000 == 0):
@@ -63,11 +63,12 @@ def main():
         3: heuristics.preferential_attachment,
         4: heuristics.katz
     }
-    SCORE_FN = score_fns[4]
+    SCORE_FN = score_fns[2]
     training_graph = load_graph('../data/processed/sampled_checkins.txt')
     edges = remove_edges(training_graph)
     users, venues = split_user_venues(training_graph)
-    scores = train(training_graph, users, venues, SCORE_FN)
+    neighbor_dict = create_neighbor_dict(training_graph)
+    scores = train(training_graph, users, venues, SCORE_FN, neighbor_dict)
     validate(edges, scores)
 
 #*******************************************************************************
@@ -91,6 +92,19 @@ def split_user_venues(graph):
         else:
             venues.add(id)
     return users, venues
+
+def create_neighbor_dict(graph):
+    """
+    Create a cache of the neighbors of all nodes in the graph
+    to speed up score calculations.
+    """
+    neighbor_dict = {}
+    for node in graph.Nodes():
+        node_id = node.GetId()
+        neighbors = tuple(get_neighbors(node))
+        neighbor_dict[node_id] = neighbors
+    assert len(neighbor_dict) == graph.GetNodes()
+    return neighbor_dict
 
 def get_neighbors(NI):
     neighbors = set()

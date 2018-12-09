@@ -49,7 +49,7 @@ Returns: False if None or empty string.
 '''
 
 MAX_USER_ID = 2153502   # pre-computed
-SPLIT_TRAIN_TEST = True # Set to False to get only one output file
+SPLIT_TRAIN_TEST = False # Set to False to get only one output file
 
 class Filetype(Enum):
     DAT = 0,

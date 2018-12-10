@@ -39,8 +39,8 @@ def validate(edges, scores):
     print('# FN: {}'.format(FN))
     print('# edges in test: {}'.format(len(edges)))
     print('Accuracy: {0:.2f}%'.format(TP * 100.0 / len(edges)))
-    print('Precision: {0:.2f}%'.format(float(TP) / (TP + FP)))
-    print('Recall: {0:.2f}%'.format(float(TP) / (TP + FN)))
+    print('Precision: {0:.2f}%'.format(TP * 100.0 / (TP + FP)))
+    print('Recall: {0:.2f}%'.format(TP * 100.0 / (TP + FN)))
 
 def remove_edges(training_graph):
     # Train: 80%, Test: 20%
@@ -48,12 +48,19 @@ def remove_edges(training_graph):
     nodes = [node.GetId() for node in training_graph.Nodes()]
     removed_edges = set()
     while num_edges_to_remove > 0:
+        # Pick a random node
         node = random.choice(nodes)
         NI = training_graph.GetNI(node)
         if NI.GetDeg() < 2:
             continue
+
+        # Pick a random neighbor with degree > 1
         neighbors = get_neighbors(NI)
         random_neighbor = random.choice(tuple(neighbors))
+        if training_graph.GetNI(random_neighbor).GetDeg() < 2:
+            continue
+
+        # Remove edge
         training_graph.DelEdge(node, random_neighbor)
         removed_edges.add((node, random_neighbor))
         num_edges_to_remove -= 1
@@ -64,10 +71,12 @@ def main():
         0: heuristics.distance,
         1: heuristics.num_common_neighbors_user,
         2: heuristics.num_common_neighbors_venue,
-        3: heuristics.preferential_attachment,
-        4: heuristics.katz
+        3: heuristics.adamic_adar_user,
+        4: heuristics.adamic_adar_venue,
+        5: heuristics.preferential_attachment,
+        6: heuristics.katz
     }
-    SCORE_FN = score_fns[3]
+    SCORE_FN = score_fns[4]
     training_graph = load_graph('../data/processed/sampled_checkins.txt')
     edges = remove_edges(training_graph)
     users, venues = split_user_venues(training_graph)

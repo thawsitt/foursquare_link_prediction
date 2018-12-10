@@ -71,17 +71,41 @@ def jaccard_coefficient(graph, x, y):
     return float(num_common) / num_total
 
 
-def adamic_adar(graph, x, y):
+def adamic_adar_user(graph, user, venue, neighbor_dict):
     """
     Weighted common neighbors
     """
-    n1 = get_neighbors(graph.GetNI(x))
-    n2 = get_neighbors(graph.GetNI(y))
-    common_neighbors = n1.intersection(n2)
+    s1 = set(neighbor_dict[user])
+    max_intersect = set()
+    for user_i in neighbor_dict[venue]:
+        s2 = set(neighbor_dict[user_i])
+        intersect = s1.intersection(s2)
+        if len(intersect) > len(max_intersect):
+            max_intersect = intersect
     weighted_score = 0
-    for z in common_neighbors:
+    for z in max_intersect:
         degree = graph.GetNI(z).GetDeg()
-        weighted_score += 1.0 / log(degree)
+        if degree > 1:
+            weighted_score += 1.0 / log(degree)
+    return weighted_score
+
+
+def adamic_adar_venue(graph, user, venue, neighbor_dict):
+    """
+    Weighted common neighbors
+    """
+    s1 = set(neighbor_dict[venue])
+    max_intersect = set()
+    for venue_i in neighbor_dict[user]:
+        s2 = set(neighbor_dict[venue_i])
+        intersect = s1.intersection(s2)
+        if len(intersect) > len(max_intersect):
+            max_intersect = intersect
+    weighted_score = 0
+    for z in max_intersect:
+        degree = graph.GetNI(z).GetDeg()
+        if degree > 1:
+            weighted_score += 1.0 / log(degree)
     return weighted_score
 
 

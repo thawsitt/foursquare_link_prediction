@@ -13,6 +13,9 @@ def plot(recalls):
     plt.xticks([i+1 for i in range(len(recalls) - 1)], heuristics[1:], rotation='vertical')
     plt.text(s='Random predictor', x=6, y=1.05)
     plt.ylabel('Relative performance ratio vs random predictions')
+    bot_lim = int(min(relative_performance) - 1)
+    top_lim = int(max(relative_performance) + 1)
+    plt.ylim((bot_lim, top_lim))
     plt.show()
 
 def main():

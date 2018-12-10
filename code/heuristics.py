@@ -60,17 +60,6 @@ def num_common_neighbors_venue(graph, user, venue, neighbor_dict):
     return max_score
 
 
-def jaccard_coefficient(graph, x, y):
-    """
-    Number of common neighbors divided by number of total neighbors
-    """
-    n1 = get_neighbors(graph.GetNI(x))
-    n2 = get_neighbors(graph.GetNI(y))
-    num_common = len(n1.intersection(n2))
-    num_total = len(n1.union(n2))
-    return float(num_common) / num_total
-
-
 def adamic_adar_user(graph, user, venue, neighbor_dict):
     """
     Weighted common neighbors

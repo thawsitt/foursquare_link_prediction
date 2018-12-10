@@ -68,15 +68,16 @@ def remove_edges(training_graph):
 
 def main():
     score_fns = {
-        0: heuristics.distance,
-        1: heuristics.num_common_neighbors_user,
-        2: heuristics.num_common_neighbors_venue,
-        3: heuristics.adamic_adar_user,
-        4: heuristics.adamic_adar_venue,
-        5: heuristics.preferential_attachment,
-        6: heuristics.katz
+        0: heuristics.random_predictor,
+        1: heuristics.distance,
+        2: heuristics.num_common_neighbors_user,
+        3: heuristics.num_common_neighbors_venue,
+        4: heuristics.adamic_adar_user,
+        5: heuristics.adamic_adar_venue,
+        6: heuristics.preferential_attachment,
+        7: heuristics.katz
     }
-    SCORE_FN = score_fns[4]
+    SCORE_FN = score_fns[0]
     training_graph = load_graph('../data/processed/sampled_checkins.txt')
     edges = remove_edges(training_graph)
     users, venues = split_user_venues(training_graph)

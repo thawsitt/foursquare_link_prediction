@@ -5,9 +5,15 @@ Contains various similarity metrics used in link prediction.
 """
 
 import snap
+import random
 from collections import Counter
 from math import log
 
+def random_predictor(graph, x, y, neighbor_dict):
+    """
+    Random predictor
+    """
+    return random.choice([0, 1])
 
 def distance(graph, x, y, neighbor_dict):
     """
